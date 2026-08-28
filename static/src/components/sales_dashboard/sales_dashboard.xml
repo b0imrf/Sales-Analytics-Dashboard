@@ -1,0 +1,389 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="sales_dashboard.SalesDashboard">
+        <div class="o_dashboard sales-dashboard h-100" dir="rtl">
+            <Layout display="{controlPanel: {}}">
+
+                <!-- Header -->
+                <div class="dashboard-header d-flex justify-content-between align-items-center mb-4">
+                    <div class="d-flex align-items-center gap-3">
+                        <h2 class="dashboard-title m-0">📊 لوحة تحليلات المبيعات</h2>
+                        <span class="badge bg-primary fs-6" t-if="!state.loading" t-esc="state.dateRange === 'today' ? 'اليوم' : state.dateRange === 'week' ? 'هذا الأسبوع' : state.dateRange === 'month' ? 'هذا الشهر' : state.dateRange === 'year' ? 'هذا العام' : 'كل الوقت'"/>
+                    </div>
+                    <div class="date-filter">
+                        <select class="form-select form-select-lg" t-on-change="onDateRangeChange">
+                            <option value="today" t-att-selected="state.dateRange === 'today'">📅 اليوم</option>
+                            <option value="week" t-att-selected="state.dateRange === 'week'">📅 هذا الأسبوع</option>
+                            <option value="month" t-att-selected="state.dateRange === 'month'">📅 هذا الشهر</option>
+                            <option value="year" t-att-selected="state.dateRange === 'year'">📅 هذا العام</option>
+                            <option value="all" t-att-selected="state.dateRange === 'all'">📅 كل الوقت</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Tabs -->
+                <ul class="nav nav-pills dashboard-tabs mb-4">
+                    <li class="nav-item">
+                        <a class="nav-link" t-att-class="{active: state.activeTab === 'main'}" t-on-click.prevent="onTabChange" data-tab="main" href="#">الرئيسية</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" t-att-class="{active: state.activeTab === 'branches'}" t-on-click.prevent="onTabChange" data-tab="branches" href="#">الفروع</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" t-att-class="{active: state.activeTab === 'employees'}" t-on-click.prevent="onTabChange" data-tab="employees" href="#">الموظفين</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" t-att-class="{active: state.activeTab === 'pos'}" t-on-click.prevent="onTabChange" data-tab="pos" href="#">نقاط البيع</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" t-att-class="{active: state.activeTab === 'customers'}" t-on-click.prevent="onTabChange" data-tab="customers" href="#">العملاء</a>
+                    </li>
+                </ul>
+
+                <!-- Loading -->
+                <div t-if="state.loading" class="text-center p-5">
+                    <div class="spinner-border text-primary spinner-border-lg" role="status">
+                        <span class="visually-hidden">جاري التحميل...</span>
+                    </div>
+                    <p class="mt-3 text-muted">جاري تحميل البيانات...</p>
+                </div>
+
+                <!-- ==================== MAIN TAB ==================== -->
+                <div t-elif="state.activeTab === 'main'" class="dashboard-content">
+
+                    <!-- KPI Cards -->
+                    <div class="row g-3 mb-4">
+                        <div class="col-xl-3 col-md-6">
+                            <div class="kpi-card primary">
+                                <div class="kpi-icon"><i class="fa fa-sack-dollar"/></div>
+                                <div class="kpi-info">
+                                    <span class="kpi-label">إجمالي المبيعات</span>
+                                    <span class="kpi-value" t-esc="formatCurrency(state.kpis.total_sales)"/>
+                                    <small t-if="state.kpis.sales_growth" t-att-class="getGrowthClass(state.kpis.sales_growth)">
+                                        <i t-att-class="'fa ' + getGrowthIcon(state.kpis.sales_growth)"/> 
+                                        <t t-esc="Math.abs(state.kpis.sales_growth)"/>% عن الفترة السابقة
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xl-3 col-md-6">
+                            <div class="kpi-card success">
+                                <div class="kpi-icon"><i class="fa fa-cart-shopping"/></div>
+                                <div class="kpi-info">
+                                    <span class="kpi-label">عدد الطلبات</span>
+                                    <span class="kpi-value" t-esc="formatNumber(state.kpis.total_orders)"/>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xl-3 col-md-6">
+                            <div class="kpi-card warning">
+                                <div class="kpi-icon"><i class="fa fa-chart-line"/></div>
+                                <div class="kpi-info">
+                                    <span class="kpi-label">متوسط قيمة الطلب</span>
+                                    <span class="kpi-value" t-esc="formatCurrency(state.kpis.avg_order)"/>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xl-3 col-md-6">
+                            <div class="kpi-card info">
+                                <div class="kpi-icon"><i class="fa fa-wallet"/></div>
+                                <div class="kpi-info">
+                                    <span class="kpi-label">صافي المبيعات</span>
+                                    <span class="kpi-value" t-esc="formatCurrency(state.kpis.net_sales)"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mb-4">
+                        <div class="col-xl-3 col-md-6">
+                            <div class="kpi-card danger">
+                                <div class="kpi-icon"><i class="fa fa-tag"/></div>
+                                <div class="kpi-info">
+                                    <span class="kpi-label">الخصومات</span>
+                                    <span class="kpi-value" t-esc="formatCurrency(state.kpis.discount_amount)"/>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xl-3 col-md-6">
+                            <div class="kpi-card secondary">
+                                <div class="kpi-icon"><i class="fa fa-rotate-left"/></div>
+                                <div class="kpi-info">
+                                    <span class="kpi-label">المرتجعات</span>
+                                    <span class="kpi-value" t-esc="formatCurrency(state.kpis.total_returns)"/>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xl-3 col-md-6">
+                            <div class="kpi-card dark">
+                                <div class="kpi-icon"><i class="fa fa-coins"/></div>
+                                <div class="kpi-info">
+                                    <span class="kpi-label">إجمالي الربح</span>
+                                    <span class="kpi-value" t-esc="formatCurrency(state.kpis.total_margin)"/>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xl-3 col-md-6">
+                            <div class="kpi-card purple">
+                                <div class="kpi-icon"><i class="fa fa-percent"/></div>
+                                <div class="kpi-info">
+                                    <span class="kpi-label">هامش الربح</span>
+                                    <span class="kpi-value" t-esc="(state.kpis.margin_percent || 0).toFixed(2) + '%'"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Charts Row -->
+                    <div class="row g-3 mb-4">
+                        <div class="col-lg-8">
+                            <div class="dashboard-card">
+                                <h4 class="card-title">📊 مبيعات الفروع</h4>
+                                <div class="chart-container">
+                                    <canvas t-ref="branchChart"/>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="dashboard-card">
+                                <h4 class="card-title">💳 طرق الدفع</h4>
+                                <div class="chart-container">
+                                    <canvas t-ref="paymentChart"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <div class="dashboard-card">
+                                <h4 class="card-title">⏰ المبيعات حسب الساعة</h4>
+                                <div class="chart-container">
+                                    <canvas t-ref="hourlyChart"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ==================== BRANCHES TAB ==================== -->
+                <div t-elif="state.activeTab === 'branches'" class="dashboard-content">
+                    <div class="row g-3 mb-4">
+                        <div class="col-lg-8">
+                            <div class="dashboard-card">
+                                <h4 class="card-title">📊 مقارنة مبيعات الفروع</h4>
+                                <div class="chart-container">
+                                    <canvas t-ref="branchChart"/>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="dashboard-card">
+                                <h4 class="card-title">🏆 ترتيب الفروع</h4>
+                                <div class="branch-ranking">
+                                    <t t-foreach="state.branches" t-as="branch" t-key="branch.id">
+                                        <div class="rank-item d-flex align-items-center gap-3 p-2" t-att-class="{'top-3': branch_index &lt; 3}">
+                                            <div class="rank-number" t-esc="branch_index + 1"/>
+                                            <div class="flex-grow-1">
+                                                <div class="fw-bold" t-esc="branch.name"/>
+                                                <div class="text-muted small">
+                                                    <t t-esc="formatNumber(branch.order_count)"/> طلب | ربح: <t t-esc="formatCurrency(branch.profit)"/>
+                                                </div>
+                                            </div>
+                                            <div class="fw-bold text-primary" t-esc="formatCurrency(branch.total_sales)"/>
+                                        </div>
+                                    </t>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="dashboard-card">
+                        <h4 class="card-title">📋 تفاصيل مبيعات الفروع</h4>
+                        <div class="table-responsive">
+                            <table class="table table-hover table-striped">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>#</th>
+                                        <th>الفرع</th>
+                                        <th>إجمالي المبيعات</th>
+                                        <th>الطلبات</th>
+                                        <th>متوسط الطلب</th>
+                                        <th>صافي المبيعات</th>
+                                        <th>الخصومات</th>
+                                        <th>المرتجعات</th>
+                                        <th>الربح</th>
+                                        <th>الهامش</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <t t-foreach="state.branches" t-as="branch" t-key="branch.id">
+                                        <tr>
+                                            <td><span class="badge bg-primary" t-esc="branch_index + 1"/></td>
+                                            <td class="fw-bold" t-esc="branch.name"/>
+                                            <td t-esc="formatCurrency(branch.total_sales)"/>
+                                            <td t-esc="formatNumber(branch.order_count)"/>
+                                            <td t-esc="formatCurrency(branch.avg_order)"/>
+                                            <td t-esc="formatCurrency(branch.net_sales)"/>
+                                            <td t-esc="formatCurrency(branch.discount)"/>
+                                            <td t-esc="formatCurrency(branch.returns)"/>
+                                            <td t-esc="formatCurrency(branch.profit)"/>
+                                            <td><t t-esc="(branch.margin_percent || 0).toFixed(1)"/>%</td>
+                                        </tr>
+                                    </t>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ==================== EMPLOYEES TAB ==================== -->
+                <div t-elif="state.activeTab === 'employees'" class="dashboard-content">
+                    <div class="row g-3 mb-4">
+                        <div class="col-lg-7">
+                            <div class="dashboard-card">
+                                <h4 class="card-title">👔 أداء الموظفين (أعلى 10)</h4>
+                                <div class="chart-container">
+                                    <canvas t-ref="employeeChart"/>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-5">
+                            <div class="dashboard-card">
+                                <h4 class="card-title">🏆 أفضل الموظفين</h4>
+                                <div class="employee-ranking">
+                                    <t t-foreach="state.employees.slice(0, 5)" t-as="emp" t-key="emp.id">
+                                        <div class="rank-item d-flex align-items-center gap-3 p-2">
+                                            <div class="rank-number gold" t-if="emp_index === 0">🥇</div>
+                                            <div class="rank-number silver" t-elif="emp_index === 1">🥈</div>
+                                            <div class="rank-number bronze" t-elif="emp_index === 2">🥉</div>
+                                            <div class="rank-number" t-else="" t-esc="emp_index + 1"/>
+                                            <div class="flex-grow-1">
+                                                <div class="fw-bold" t-esc="emp.name"/>
+                                                <div class="text-muted small">
+                                                    <t t-esc="formatNumber(emp.order_count)"/> طلب | خصومات: <t t-esc="formatCurrency(emp.discount_value)"/>
+                                                </div>
+                                            </div>
+                                            <div class="fw-bold text-success" t-esc="formatCurrency(emp.total_sales)"/>
+                                        </div>
+                                    </t>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="dashboard-card">
+                        <h4 class="card-title">📋 تفاصيل أداء الموظفين</h4>
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>#</th>
+                                        <th>الموظف</th>
+                                        <th>المبيعات</th>
+                                        <th>الطلبات</th>
+                                        <th>متوسط الطلب</th>
+                                        <th>عدد الخصومات</th>
+                                        <th>قيمة الخصومات</th>
+                                        <th>الإلغاءات</th>
+                                        <th>المرتجعات</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <t t-foreach="state.employees" t-as="emp" t-key="emp.id">
+                                        <tr>
+                                            <td><span class="badge bg-primary" t-esc="emp_index + 1"/></td>
+                                            <td class="fw-bold" t-esc="emp.name"/>
+                                            <td t-esc="formatCurrency(emp.total_sales)"/>
+                                            <td t-esc="formatNumber(emp.order_count)"/>
+                                            <td t-esc="formatCurrency(emp.avg_order)"/>
+                                            <td t-esc="formatNumber(emp.discount_count)"/>
+                                            <td t-esc="formatCurrency(emp.discount_value)"/>
+                                            <td t-esc="formatNumber(emp.cancelled)"/>
+                                            <td t-esc="formatCurrency(emp.returns)"/>
+                                        </tr>
+                                    </t>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ==================== POS TAB ==================== -->
+                <div t-elif="state.activeTab === 'pos'" class="dashboard-content">
+                    <div class="dashboard-card">
+                        <h4 class="card-title">🖥️ تحليلات نقاط البيع</h4>
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>نقطة البيع</th>
+                                        <th>الفرع</th>
+                                        <th>المبيعات</th>
+                                        <th>الطلبات</th>
+                                        <th>متوسط الفاتورة</th>
+                                        <th>النقد المتوقع</th>
+                                        <th>النقد الفعلي</th>
+                                        <th>الفروقات</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <t t-foreach="state.posData" t-as="pos" t-key="pos.id">
+                                        <tr>
+                                            <td class="fw-bold" t-esc="pos.name"/>
+                                            <td t-esc="pos.branch_name"/>
+                                            <td t-esc="formatCurrency(pos.total_sales)"/>
+                                            <td t-esc="formatNumber(pos.order_count)"/>
+                                            <td t-esc="formatCurrency(pos.avg_order)"/>
+                                            <td t-esc="formatCurrency(pos.expected_cash)"/>
+                                            <td t-esc="formatCurrency(pos.actual_cash)"/>
+                                            <td t-att-class="pos.differences !== 0 ? (pos.differences > 0 ? 'text-success' : 'text-danger') : ''">
+                                                <t t-esc="formatCurrency(pos.differences)"/>
+                                            </td>
+                                        </tr>
+                                    </t>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ==================== CUSTOMERS TAB ==================== -->
+                <div t-elif="state.activeTab === 'customers'" class="dashboard-content">
+                    <div class="dashboard-card">
+                        <h4 class="card-title">👥 تحليلات العملاء (أفضل 50 عميل)</h4>
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>#</th>
+                                        <th>العميل</th>
+                                        <th>المدينة</th>
+                                        <th>إجمالي المشتريات</th>
+                                        <th>عدد الطلبات</th>
+                                        <th>متوسط الطلب</th>
+                                        <th>آخر عملية شراء</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <t t-foreach="state.customers" t-as="cust" t-key="cust.id">
+                                        <tr>
+                                            <td><span class="badge bg-primary" t-esc="cust_index + 1"/></td>
+                                            <td class="fw-bold" t-esc="cust.name"/>
+                                            <td t-esc="cust.city"/>
+                                            <td t-esc="formatCurrency(cust.total_sales)"/>
+                                            <td t-esc="formatNumber(cust.order_count)"/>
+                                            <td t-esc="formatCurrency(cust.avg_order)"/>
+                                            <td t-esc="cust.last_order"/>
+                                        </tr>
+                                    </t>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+            </Layout>
+        </div>
+    </t>
+</templates>

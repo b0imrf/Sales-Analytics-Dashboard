@@ -1,0 +1,185 @@
+.sales-dashboard {
+    overflow-y: auto;
+    max-height: calc(100vh - 50px);       
+    background-color: #f3f4f6;
+    padding: 24px;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+
+    .dashboard-title {
+        color: #1f2937;
+        font-weight: 800;
+        font-size: 1.75rem;
+        letter-spacing: -0.5px;
+    }
+
+    .dashboard-tabs {
+        background: white;
+        padding: 8px;
+        border-radius: 12px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+
+        .nav-link {
+            color: #6b7280;
+            font-weight: 600;
+            padding: 10px 24px;
+            border-radius: 8px;
+            transition: all 0.2s;
+
+            &:hover {
+                color: #714B67;
+                background: #f9fafb;
+            }
+
+            &.active {
+                background: #714B67;
+                color: white;
+                box-shadow: 0 4px 12px rgba(113, 75, 103, 0.3);
+            }
+        }
+    }
+
+    .kpi-card {
+        background: white;
+        border-radius: 16px;
+        padding: 24px;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+        transition: all 0.3s ease;
+        border-right: 5px solid transparent;
+
+        &:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+        }
+
+        &.primary { border-right-color: #714B67; .kpi-icon { background: rgba(113, 75, 103, 0.12); color: #714B67; } }
+        &.success { border-right-color: #10b981; .kpi-icon { background: rgba(16, 185, 129, 0.12); color: #10b981; } }
+        &.warning { border-right-color: #f59e0b; .kpi-icon { background: rgba(245, 158, 11, 0.12); color: #f59e0b; } }
+        &.info { border-right-color: #3b82f6; .kpi-icon { background: rgba(59, 130, 246, 0.12); color: #3b82f6; } }
+        &.danger { border-right-color: #ef4444; .kpi-icon { background: rgba(239, 68, 68, 0.12); color: #ef4444; } }
+        &.secondary { border-right-color: #6b7280; .kpi-icon { background: rgba(107, 114, 128, 0.12); color: #6b7280; } }
+        &.dark { border-right-color: #1f2937; .kpi-icon { background: rgba(31, 41, 55, 0.12); color: #1f2937; } }
+        &.purple { border-right-color: #8b5cf6; .kpi-icon { background: rgba(139, 92, 246, 0.12); color: #8b5cf6; } }
+
+        .kpi-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 26px;
+            flex-shrink: 0;
+        }
+
+        .kpi-info {
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+
+            .kpi-label {
+                font-size: 0.85rem;
+                color: #6b7280;
+                font-weight: 500;
+                margin-bottom: 4px;
+            }
+
+            .kpi-value {
+                font-size: 1.5rem;
+                font-weight: 800;
+                color: #1f2937;
+                line-height: 1.2;
+            }
+        }
+    }
+
+    .dashboard-card {
+        background: white;
+        border-radius: 16px;
+        padding: 24px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+        height: 100%;
+
+        .card-title {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #f3f4f6;
+        }
+
+        .chart-container {
+            height: 320px;
+            position: relative;
+        }
+    }
+
+    .branch-ranking, .employee-ranking {
+        max-height: 400px;
+        overflow-y: auto;
+
+        .rank-item {
+            border-bottom: 1px solid #f3f4f6;
+            transition: background 0.2s;
+
+            &:hover {
+                background: #f9fafb;
+                border-radius: 8px;
+            }
+
+            &.top-3 {
+                background: linear-gradient(90deg, rgba(113,75,103,0.05) 0%, transparent 100%);
+            }
+
+            .rank-number {
+                width: 36px;
+                height: 36px;
+                border-radius: 50%;
+                background: #e5e7eb;
+                color: #374151;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 0.9rem;
+                font-weight: 700;
+                flex-shrink: 0;
+
+                &.gold { background: #fef3c7; color: #d97706; font-size: 1.3rem; }
+                &.silver { background: #f3f4f6; color: #6b7280; font-size: 1.3rem; }
+                &.bronze { background: #ffedd5; color: #c2410c; font-size: 1.3rem; }
+            }
+        }
+    }
+
+    .table {
+        font-size: 0.9rem;
+
+        thead th {
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            letter-spacing: 0.5px;
+        }
+
+        tbody tr:hover {
+            background-color: #f9fafb;
+        }
+    }
+
+    .date-filter {
+        .form-select {
+            border-radius: 10px;
+            border: 2px solid #e5e7eb;
+            font-weight: 600;
+            padding: 10px 40px 10px 16px;
+
+            &:focus {
+                border-color: #714B67;
+                box-shadow: 0 0 0 3px rgba(113, 75, 103, 0.15);
+            }
+        }
+    }
+}

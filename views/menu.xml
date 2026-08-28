@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <menuitem id="menu_sales_dashboard_root"
+              name="تحليلات المبيعات"
+              web_icon="sales_dashboard,static/description/icon.png"
+              sequence="10"/>
+
+    <menuitem id="menu_sales_dashboard_main"
+              name="لوحة المبيعات الرئيسية"
+              parent="menu_sales_dashboard_root"
+              action="action_sales_dashboard"
+              sequence="10"/>
+
+    <menuitem id="menu_res_branch"
+              name="الفروع"
+              parent="menu_sales_dashboard_root"
+              action="action_res_branch"
+              sequence="20"
+              groups="sales_dashboard.group_sales_dashboard_manager"/>
+</odoo>

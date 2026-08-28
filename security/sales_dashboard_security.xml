@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="group_sales_dashboard_manager" model="res.groups">
+        <field name="name">Sales Dashboard Manager</field>
+        <field name="category_id" ref="base.module_category_sales"/>
+        <field name="users" eval="[(4, ref('base.user_admin'))]"/>
+    </record>
+
+    <record id="group_sales_dashboard_user" model="res.groups">
+        <field name="name">Sales Dashboard User</field>
+        <field name="category_id" ref="base.module_category_sales"/>
+    </record>
+</odoo>
